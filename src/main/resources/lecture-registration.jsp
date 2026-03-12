@@ -40,8 +40,8 @@
                 },
                 body: jsonData
             }).then(response => {
-                if (response.redirected) {
-                    window.location.href = response.url;
+                if (response.ok) {
+                    window.location.href = "/lectures";
                 }
             });
         });
