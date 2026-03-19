@@ -19,16 +19,14 @@ public class TomcatWebServer {
 
     public void start() {
         setServerContext();
-        startDaemonAwaitThread();
         startServerInternal();
+        startDaemonAwaitThread();
     }
 
     public void startServerInternal() {
         try {
             tomcat.setPort(port);
             tomcat.start();
-            final Thread awaitThread = new Thread(() -> tomcat.getServer().await());
-            awaitThread.start();
         } catch (LifecycleException e) {
             throw new RuntimeException("톰켓 서버 실행 중 예외가 발생했습니다.", e);
         }
