@@ -3,7 +3,7 @@ package com.diy.app.lecture;
 import com.diy.app.lecture.domain.Lecture;
 import com.diy.framework.web.Controller;
 import com.diy.framework.web.model.Model;
-import com.diy.framework.web.view.JspView;
+import com.diy.framework.web.view.ViewResolver;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -37,17 +37,16 @@ public class LectureController implements Controller {
      * @param req
      * @param resp
      */
-    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         System.out.println("doGet called.");
 
         final Collection<Lecture> lectures = lectureRepository.values();
 
         Model model = new Model();
         model.addAttribute("lectures", lectures);
-        model.getAttribute().forEach(req::setAttribute);
 
-        final JspView jspView = new JspView("lecture-list.jsp");
-        jspView.render(req, resp, model);
+        ViewResolver viewResolver = new ViewResolver();
+        viewResolver.resolve("lecture-list").render(req, resp, model);
     }
 
     /**

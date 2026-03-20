@@ -18,6 +18,7 @@ public class JspView implements View{
     @Override
     public void render(final HttpServletRequest req, final HttpServletResponse res, final Model model) throws ServletException, IOException {
         final RequestDispatcher requestDispatcher = req.getRequestDispatcher(viewName);
+        model.getAttribute().forEach(req::setAttribute);
         requestDispatcher.forward(req, res);
     }
 }
