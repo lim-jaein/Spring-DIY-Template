@@ -1,5 +1,7 @@
 package com.diy.framework.web.view;
 
+import com.diy.framework.web.model.Model;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -14,7 +16,7 @@ public class JspView implements View{
     }
 
     @Override
-    public void render(final HttpServletRequest req, final HttpServletResponse res) throws ServletException, IOException {
+    public void render(final HttpServletRequest req, final HttpServletResponse res, final Model model) throws ServletException, IOException {
         final RequestDispatcher requestDispatcher = req.getRequestDispatcher(viewName);
         requestDispatcher.forward(req, res);
     }

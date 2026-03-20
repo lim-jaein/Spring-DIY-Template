@@ -2,6 +2,7 @@ package com.diy.app.lecture;
 
 import com.diy.app.lecture.domain.Lecture;
 import com.diy.framework.web.Controller;
+import com.diy.framework.web.model.Model;
 import com.diy.framework.web.view.JspView;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,8 +23,6 @@ public class LectureController implements Controller {
 
     @Override
     public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        String method = request.getMethod();
-
         switch (request.getMethod()) {
             case "GET" -> doGet(request, response);
             case "POST" -> doPost(request, response);
@@ -42,9 +41,13 @@ public class LectureController implements Controller {
         System.out.println("doGet called.");
 
         final Collection<Lecture> lectures = lectureRepository.values();
-        req.setAttribute("lectures", lectures);
 
-        req.getRequestDispatcher("/lecture-list.jsp").forward(req, resp);
+        Model model = new Model();
+        model.addAttribute("lectures", lectures);
+        model.getAttribute().forEach(req::setAttribute);
+
+        final JspView jspView = new JspView("lecture-list.jsp");
+        jspView.render(req, resp, model);
     }
 
     /**
