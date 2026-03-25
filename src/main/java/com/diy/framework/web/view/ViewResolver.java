@@ -4,6 +4,10 @@ public class ViewResolver {
     public View resolve(String viewName) {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
+        if (viewName.startsWith("redirect:")) {
+            return new RedirectView(viewName.substring("redirect:".length()));
+        }
+
         if (classLoader.getResource(viewName + ".jsp") != null) {
             return new JspView("/" + viewName + ".jsp");
         }
