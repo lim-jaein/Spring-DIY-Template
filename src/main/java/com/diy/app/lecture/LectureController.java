@@ -3,6 +3,7 @@ package com.diy.app.lecture;
 import com.diy.app.lecture.domain.Lecture;
 import com.diy.framework.web.Controller;
 import com.diy.framework.web.model.Model;
+import com.diy.framework.web.model.ModelAndView;
 import com.diy.framework.web.view.ViewResolver;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,8 +23,8 @@ public class LectureController implements Controller {
     private final AtomicLong idSequence = new AtomicLong();
 
     @Override
-    public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        switch (request.getMethod()) {
+    public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        return switch (request.getMethod()) {
             case "GET" -> doGet(request, response);
             case "POST" -> doPost(request, response);
             case "PUT" -> doPut(request, response);
@@ -37,7 +38,7 @@ public class LectureController implements Controller {
      * @param req
      * @param resp
      */
-    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    public ModelAndView doGet(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         System.out.println("doGet called.");
 
         final Collection<Lecture> lectures = lectureRepository.values();
@@ -45,8 +46,7 @@ public class LectureController implements Controller {
         Model model = new Model();
         model.addAttribute("lectures", lectures);
 
-        ViewResolver viewResolver = new ViewResolver();
-        viewResolver.resolve("lecture-list").render(req, resp, model);
+        return new ModelAndView("lecture-list", model);
     }
 
     /**
@@ -56,7 +56,7 @@ public class LectureController implements Controller {
      * @throws ServletException
      * @throws IOException
      */
-    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public ModelAndView doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         System.out.println("doPost called.");
 
         try {
@@ -73,6 +73,8 @@ public class LectureController implements Controller {
         } catch (Exception e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
+
+        return new ModelAndView("redirect:/lectures");
     }
 
     /**
@@ -80,7 +82,7 @@ public class LectureController implements Controller {
      * @param req
      * @param resp
      */
-    public void doPut(HttpServletRequest req, HttpServletResponse resp) {
+    public ModelAndView doPut(HttpServletRequest req, HttpServletResponse resp) {
         System.out.println("doPut called.");
 
         try {
@@ -88,7 +90,7 @@ public class LectureController implements Controller {
             final long id = Long.parseLong(requestUri.substring(requestUri.lastIndexOf("/") + 1));
             if(!lectureRepository.containsKey(id)) {
                 resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                return;
+                return null;
             }
 
             final Lecture lecture = objectMapper.readValue(req.getReader(), Lecture.class);
@@ -100,6 +102,8 @@ public class LectureController implements Controller {
         } catch (Exception e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
+
+        return new ModelAndView("redirect:/lectures");
     }
 
     /**
@@ -109,15 +113,17 @@ public class LectureController implements Controller {
      * @throws ServletException
      * @throws IOException
      */
-    public void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public ModelAndView doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         System.out.println("doDelete called.");
         final String requestUri = req.getRequestURI();
         final long id = Long.parseLong(requestUri.substring(requestUri.lastIndexOf("/") + 1));
         if(!lectureRepository.containsKey(id)) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return;
+        } else {
+            lectureRepository.remove(id);
+            resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
         }
-        lectureRepository.remove(id);
-        resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+
+        return new ModelAndView("redirect:/lectures");
     }
 }

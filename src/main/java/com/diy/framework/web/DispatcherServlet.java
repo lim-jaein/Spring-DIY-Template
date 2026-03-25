@@ -3,6 +3,9 @@ package com.diy.framework.web;
 import com.diy.app.lecture.LectureController;
 import com.diy.framework.web.mapping.ControllerKey;
 import com.diy.framework.web.mapping.ControllerMapping;
+import com.diy.framework.web.model.ModelAndView;
+import com.diy.framework.web.view.View;
+import com.diy.framework.web.view.ViewResolver;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -18,6 +21,7 @@ import java.util.Map;
 @WebServlet("/")
 public class DispatcherServlet extends HttpServlet {
     private final ControllerMapping controllerMapping = new ControllerMapping();
+    private final ViewResolver viewResolver = new ViewResolver();
 
     @Override
     public void init() throws ServletException {
@@ -37,10 +41,23 @@ public class DispatcherServlet extends HttpServlet {
             return;
         }
         try {
-            controller.handleRequest(req, resp);
+            ModelAndView modelAndView = controller.handleRequest(req, resp);
+            render(req, resp, modelAndView);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void render(HttpServletRequest req, HttpServletResponse resp, ModelAndView modelAndView) throws Exception {
+        final String viewName = modelAndView.getViewName();
+        final View view = viewResolver.resolve(viewName);
+
+        if (view == null) {
+            throw new RuntimeException("View not found: "+viewName);
+        } else {
+            view.render(req, resp, modelAndView.getModel());
+        }
+
     }
 
     /**

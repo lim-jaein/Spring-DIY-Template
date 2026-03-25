@@ -1,12 +1,11 @@
 package com.diy.framework.web.view;
 
-import com.diy.framework.web.model.Model;
-
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 public class JspView implements View{
     private final String viewName;
@@ -16,9 +15,9 @@ public class JspView implements View{
     }
 
     @Override
-    public void render(final HttpServletRequest req, final HttpServletResponse res, final Model model) throws ServletException, IOException {
+    public void render(final HttpServletRequest req, final HttpServletResponse res, final Map<String, Object> model) throws ServletException, IOException {
         final RequestDispatcher requestDispatcher = req.getRequestDispatcher(viewName);
-        model.getAttribute().forEach(req::setAttribute);
+        model.forEach(req::setAttribute);
         requestDispatcher.forward(req, res);
     }
 }
