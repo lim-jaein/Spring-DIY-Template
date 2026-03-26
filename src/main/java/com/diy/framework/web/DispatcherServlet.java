@@ -1,6 +1,7 @@
 package com.diy.framework.web;
 
 import com.diy.app.lecture.LectureController;
+import com.diy.app.lecture.infrastructure.InMemoryLectureRepository;
 import com.diy.framework.web.mapping.ControllerKey;
 import com.diy.framework.web.mapping.ControllerMapping;
 import com.diy.framework.web.model.ModelAndView;
@@ -25,7 +26,7 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        LectureController lectureController = new LectureController();
+        LectureController lectureController = new LectureController(new InMemoryLectureRepository());
         controllerMapping.setController(new ControllerKey("GET", "/lectures"), lectureController);
         controllerMapping.setController(new ControllerKey("POST", "/lectures"), lectureController);
         controllerMapping.setController(new ControllerKey("PUT", "/lectures/{id}"), lectureController);
