@@ -2,6 +2,9 @@ package com.diy.framework.web;
 
 import com.diy.app.lecture.LectureController;
 import com.diy.app.lecture.infrastructure.InMemoryLectureRepository;
+import com.diy.framework.web.annotation.Component;
+import com.diy.framework.web.beans.factory.BeanFactory;
+import com.diy.framework.web.beans.factory.BeanScanner;
 import com.diy.framework.web.mapping.ControllerKey;
 import com.diy.framework.web.mapping.ControllerMapping;
 import com.diy.framework.web.model.ModelAndView;
@@ -18,14 +21,18 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Set;
 
 @WebServlet("/")
 public class DispatcherServlet extends HttpServlet {
     private final ControllerMapping controllerMapping = new ControllerMapping();
     private final ViewResolver viewResolver = new ViewResolver();
+    private BeanFactory beanFactory;
 
     @Override
     public void init() throws ServletException {
+        beanFactory = new BeanFactory("com.diy");
+
         LectureController lectureController = new LectureController(new InMemoryLectureRepository());
         controllerMapping.setController(new ControllerKey("GET", "/lectures"), lectureController);
         controllerMapping.setController(new ControllerKey("POST", "/lectures"), lectureController);
