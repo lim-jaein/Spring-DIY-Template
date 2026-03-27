@@ -22,11 +22,10 @@ import java.util.Map;
 public class DispatcherServlet extends HttpServlet {
     private final ControllerMapping controllerMapping = new ControllerMapping();
     private final ViewResolver viewResolver = new ViewResolver();
-    private BeanFactory beanFactory;
 
     @Override
     public void init() {
-        beanFactory = new BeanFactory("com.diy");
+        BeanFactory beanFactory = new BeanFactory("com.diy");
         LectureController lectureController = (LectureController) beanFactory.getBean(LectureController.class);
 
         controllerMapping.setController(new ControllerKey("GET", "/lectures"), lectureController);
