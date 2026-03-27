@@ -1,9 +1,9 @@
 package com.diy.app.lecture;
 
-import com.diy.app.lecture.infrastructure.InMemoryLectureRepository;
 import com.diy.app.lecture.domain.Lecture;
 import com.diy.app.lecture.domain.LectureRepository;
 import com.diy.framework.web.Controller;
+import com.diy.framework.web.annotation.Autowired;
 import com.diy.framework.web.model.Model;
 import com.diy.framework.web.model.ModelAndView;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,6 +21,7 @@ public class LectureController implements Controller {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final AtomicLong idSequence = new AtomicLong();
 
+    @Autowired
     public LectureController(LectureRepository lectureRepository) {
         this.lectureRepository = lectureRepository;
     }

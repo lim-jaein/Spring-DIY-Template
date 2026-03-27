@@ -1,10 +1,7 @@
 package com.diy.framework.web;
 
 import com.diy.app.lecture.LectureController;
-import com.diy.app.lecture.infrastructure.InMemoryLectureRepository;
-import com.diy.framework.web.annotation.Component;
 import com.diy.framework.web.beans.factory.BeanFactory;
-import com.diy.framework.web.beans.factory.BeanScanner;
 import com.diy.framework.web.mapping.ControllerKey;
 import com.diy.framework.web.mapping.ControllerMapping;
 import com.diy.framework.web.model.ModelAndView;
@@ -13,7 +10,6 @@ import com.diy.framework.web.view.ViewResolver;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import java.util.Set;
 
 @WebServlet("/")
 public class DispatcherServlet extends HttpServlet {
@@ -30,10 +25,10 @@ public class DispatcherServlet extends HttpServlet {
     private BeanFactory beanFactory;
 
     @Override
-    public void init() throws ServletException {
+    public void init() {
         beanFactory = new BeanFactory("com.diy");
+        LectureController lectureController = (LectureController) beanFactory.getBean(LectureController.class);
 
-        LectureController lectureController = new LectureController(new InMemoryLectureRepository());
         controllerMapping.setController(new ControllerKey("GET", "/lectures"), lectureController);
         controllerMapping.setController(new ControllerKey("POST", "/lectures"), lectureController);
         controllerMapping.setController(new ControllerKey("PUT", "/lectures/{id}"), lectureController);
