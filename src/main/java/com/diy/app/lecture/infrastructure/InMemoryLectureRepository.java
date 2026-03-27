@@ -2,11 +2,13 @@ package com.diy.app.lecture.infrastructure;
 
 import com.diy.app.lecture.domain.Lecture;
 import com.diy.app.lecture.domain.LectureRepository;
+import com.diy.framework.web.annotation.Component;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Component
 public class InMemoryLectureRepository implements LectureRepository {
     private final Map<Long, Lecture> lectureMap = new ConcurrentHashMap<>();
 
