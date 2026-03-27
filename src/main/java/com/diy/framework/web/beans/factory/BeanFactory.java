@@ -7,7 +7,6 @@ import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @Component 어노테이션이 붙은 클래스를 스캔하여 인스턴스를 생성하고 보관하는 객체
@@ -30,13 +29,15 @@ public class BeanFactory {
             Constructor<?> autowiredConstructor = findAutowiredConstructor(clazz);
             if (autowiredConstructor == null) {
                 bean = clazz.getDeclaredConstructor().newInstance();
-                beans.put(clazz, bean);
             } else {
                 Object[] params = Arrays.stream(autowiredConstructor.getParameterTypes())
                         .map(this::getBean)
                         .toArray();
                 bean = autowiredConstructor.newInstance(params);
-                beans.put(clazz, bean);
+            }
+            beans.put(clazz, bean);
+            for (Class<?> iFace : clazz.getInterfaces()) {
+                beans.put(iFace, bean);
             }
         } catch (Exception e) {
             throw new RuntimeException(clazz.getName() + " 빈 생성 실패", e);
@@ -44,16 +45,9 @@ public class BeanFactory {
         return bean;
     }
 
-    public Object getBean(Class<?> type) {
-        Object bean = beans.values().stream()
-                .filter(b -> type.isAssignableFrom(b.getClass()))
-                .findFirst()
-                .orElse(null);
-
-        if (bean == null) {
-            bean = createBean(type);
-        }
-        return bean;
+    public Object getBean(Class<?> clazz) {
+        Object bean = beans.get(clazz);
+        return bean == null ? createBean(clazz) : bean;
     }
 
     private Constructor<?> findAutowiredConstructor(Class<?> clazz) {
