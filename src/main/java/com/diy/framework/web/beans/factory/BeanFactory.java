@@ -9,13 +9,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @Component 어노테이션이 붙은 클래스를 스캔하여 인스턴스를 생성하고 보관하는 객체
- * 생성된 빈은 타입을 키로 Map에 저장되며, 필요한 곳에서 꺼내 의존성을 주입할 때 사용된다.
+ * 생성된 빈은 구현체 타입과 인터페이스 타입을 키로 Map에 저장되며,
+ * getBean 호출 시 이미 생성된 빈을 반환하거나 없으면 새로 생성하여 주입한다.
  */
 public class BeanFactory {
     private final BeanScanner beanScanner;
-    private Map<Class<?>, Object> beans = new HashMap<>();
+    private final Map<Class<?>, Object> beans = new HashMap<>();
 
+    /**
+     * @Component 어노테이션이 붙은 클래스를 스캔하여 인스턴스를 생성하고 보관
+     * @param basePackages
+     */
     public BeanFactory(String basePackages) {
         beanScanner = new BeanScanner(basePackages);
         beanScanner.scanClassesTypeAnnotatedWith(Component.class)
