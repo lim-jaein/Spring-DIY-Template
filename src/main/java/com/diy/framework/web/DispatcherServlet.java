@@ -1,6 +1,8 @@
 package com.diy.framework.web;
 
 import com.diy.app.lecture.LectureController;
+import com.diy.app.lecture.domain.LectureRepository;
+import com.diy.app.lecture.infrastructure.InMemoryLectureRepository;
 import com.diy.framework.web.beans.factory.BeanFactory;
 import com.diy.framework.web.mapping.ControllerKey;
 import com.diy.framework.web.mapping.ControllerMapping;
