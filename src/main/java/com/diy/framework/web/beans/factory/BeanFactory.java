@@ -1,63 +1,39 @@
 package com.diy.framework.web.beans.factory;
 
-import com.diy.framework.web.annotation.Autowired;
-import com.diy.framework.web.annotation.Component;
-
-import java.lang.reflect.Constructor;
-import java.util.Arrays;
+import java.lang.annotation.Annotation;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
- * @Component 어노테이션이 붙은 클래스를 스캔하여 인스턴스를 생성하고 보관하는 객체
- * 생성된 빈은 구현체 타입을 키로 Map에 저장되며, getBean 호출 시 타입 호환성으로 검색하여 반환한다.
+ * 빈 인스턴스를 생성하고 보관하는 객체
+ * 생성된 빈은 이름을 키로 Map에 저장되며, getBean 호출 시 반환된다.
+ * 생성자에서 @Component 스캔해서 빈 등록
+ * 별도 메서드로 @Bean 메서드를 통해 빈 등록
  */
 public class BeanFactory {
-    private final BeanScanner beanScanner;
-    private final Map<Class<?>, Object> beans = new HashMap<>();
+    private final Map<String, Object> beans = new HashMap<>();
 
     public BeanFactory(String basePackages) {
-        beanScanner = new BeanScanner(basePackages);
-        beanScanner.scanClassesTypeAnnotatedWith(Component.class)
-                .forEach(this::createBean);
+        List<BeanCreator> beanCreators = List.of(
+                new ComponentBeanCreator(basePackages, beans),      // @Component 스캔
+                new NamedBeanCreator(beans)                         // BeanConfig에 등록된 @Bean 메서드 처리
+        );
+
+        beanCreators.forEach(BeanCreator::createBeans);
     }
 
-    private Object createBean(Class<?> clazz) {
-        Object bean;
-        try {
-            // @Autowired 붙은 생성자 존재 여부 확인
-            Constructor<?> autowiredConstructor = findAutowiredConstructor(clazz);
-            if (autowiredConstructor == null) {
-                bean = clazz.getDeclaredConstructor().newInstance();
-            } else {
-                Object[] params = Arrays.stream(autowiredConstructor.getParameterTypes())
-                        .map(this::getBean)
-                        .toArray();
-                bean = autowiredConstructor.newInstance(params);
-            }
-            beans.put(clazz, bean);
-        } catch (Exception e) {
-            throw new RuntimeException(clazz.getName() + " 빈 생성 실패", e);
-        }
-        return bean;
+    // 이름으로 빈 조회
+    public Object getBean(String name) {
+        return beans.get(name);
     }
 
-    /**
-     * 타입 호환성으로 빈을 검색하여 반환한다.
-     * 인터페이스나 상위 타입으로 요청해도 구현체 빈을 찾아 반환하며, 등록된 빈이 없으면 새로 생성한다.
-     */
-    public Object getBean(Class<?> clazz) {
+    // 어노테이션으로 빈 조회
+    public Collection<Object> getBeans(Class<? extends Annotation> annotation) {
         return beans.values().stream()
-                .filter(b -> clazz.isAssignableFrom(b.getClass()))
-                .findFirst()
-                .orElseGet(() -> createBean(clazz));
+                .filter(b -> b.getClass().isAnnotationPresent(annotation))
+                .collect(Collectors.toList());
     }
-
-    private Constructor<?> findAutowiredConstructor(Class<?> clazz) {
-        return Arrays.stream(clazz.getDeclaredConstructors())
-                .filter(constructor -> constructor.isAnnotationPresent(Autowired.class))
-                .findFirst()
-                .orElse(null);
-    }
-
 }
