@@ -1,5 +1,6 @@
 package com.diy.framework.web.server;
 
+import com.diy.framework.web.context.ApplicationContext;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
@@ -16,6 +17,11 @@ public class TomcatWebServer {
 
     private final Tomcat tomcat = new Tomcat();
     private final int port = 8080;
+    private final ApplicationContext applicationContext;
+
+    public TomcatWebServer(final ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
 
     public void start() {
         setServerContext();
@@ -37,6 +43,8 @@ public class TomcatWebServer {
         final String absoluteResourcesPath = new File(resourcesPath).getAbsolutePath();
 
         final Context context = this.tomcat.addWebapp("/", absoluteResourcesPath);
+
+        context.getServletContext().setAttribute("applicationContext", applicationContext);
 
         setServerResources(context);
     }
