@@ -1,4 +1,4 @@
-package com.diy.framework.web.beans.factory;
+package com.diy.app.config;
 
 import com.diy.app.lecture.LectureController;
 import com.diy.app.lecture.domain.LectureRepository;
