@@ -1,6 +1,7 @@
 package com.diy.framework.web;
 
 import com.diy.framework.web.annotation.RequestMapping;
+import com.diy.framework.web.beans.factory.BeanConfig;
 import com.diy.framework.web.beans.factory.BeanFactory;
 import com.diy.framework.web.mapping.ControllerMapping;
 import com.diy.framework.web.model.ModelAndView;
@@ -22,7 +23,7 @@ public class DispatcherServlet extends HttpServlet {
     @Override
     public void init() {
         // 최초 빈 등록
-        BeanFactory beanFactory = new BeanFactory("com.diy");
+        BeanFactory beanFactory = new BeanFactory("com.diy", new BeanConfig());
 
         // Controller url 매핑
         controllerMapping.register(beanFactory);
