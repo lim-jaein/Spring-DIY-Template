@@ -1,12 +1,14 @@
 package com.diy.framework.web.mapping;
 
+import com.diy.framework.web.annotation.RequestMethod;
+
 import java.util.Objects;
 
 public class ControllerKey {
-    private final String method;
+    private final RequestMethod method;
     private final String path;
 
-    public ControllerKey(String method, String path) {
+    public ControllerKey(RequestMethod method, String path) {
         this.method = method;
         this.path = path;
     }
@@ -27,7 +29,7 @@ public class ControllerKey {
         return this.method.equals(other.method) && other.path.matches(this.path.replaceAll("\\{[^}]+}", "[0-9]+"));
     }
 
-    public String getMethod() {
+    public RequestMethod getMethod() {
         return method;
     }
 

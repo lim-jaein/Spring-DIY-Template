@@ -4,6 +4,7 @@ import com.diy.app.lecture.domain.Lecture;
 import com.diy.app.lecture.domain.LectureRepository;
 import com.diy.framework.web.annotation.Controller;
 import com.diy.framework.web.annotation.RequestMapping;
+import com.diy.framework.web.annotation.RequestMethod;
 import com.diy.framework.web.model.Model;
 import com.diy.framework.web.model.ModelAndView;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -29,7 +30,7 @@ public class LectureController {
     /**
      * 강의 목록 조회 API
      */
-    @RequestMapping(method = "GET", value = "/lectures")
+    @RequestMapping(methods = RequestMethod.GET, value = "/lectures")
     public ModelAndView doGet(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         System.out.println("doGet called.");
 
@@ -44,7 +45,7 @@ public class LectureController {
     /**
      * 강의 등록 API
      */
-    @RequestMapping(method = "POST", value = "/lectures")
+    @RequestMapping(methods = RequestMethod.POST, value = "/lectures")
     public ModelAndView doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         System.out.println("doPost called.");
 
@@ -69,7 +70,7 @@ public class LectureController {
     /**
      * 강의 수정 API
      */
-    @RequestMapping(method = "PUT", value = "/lectures/{id}")
+    @RequestMapping(methods = RequestMethod.PUT, value = "/lectures/{id}")
     public ModelAndView doPut(HttpServletRequest req, HttpServletResponse resp) {
         System.out.println("doPut called.");
 
@@ -97,7 +98,7 @@ public class LectureController {
     /**
      * 강의 삭제 API
      */
-    @RequestMapping(method = "DELETE", value = "/lectures/{id}")
+    @RequestMapping(methods = RequestMethod.DELETE, value = "/lectures/{id}")
     public ModelAndView doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         System.out.println("doDelete called.");
         final String requestUri = req.getRequestURI();

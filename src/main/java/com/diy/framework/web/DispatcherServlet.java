@@ -1,6 +1,7 @@
 package com.diy.framework.web;
 
 import com.diy.framework.web.annotation.RequestMapping;
+import com.diy.framework.web.annotation.RequestMethod;
 import com.diy.framework.web.context.ApplicationContext;
 import com.diy.framework.web.mapping.ControllerMapping;
 import com.diy.framework.web.model.ModelAndView;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.List;
 
 @WebServlet("/")
 public class DispatcherServlet extends HttpServlet {
@@ -47,7 +49,8 @@ public class DispatcherServlet extends HttpServlet {
         for (Method method : controller.getClass().getMethods()) {
             if (method.isAnnotationPresent(RequestMapping.class)) {
                 RequestMapping mapping = method.getAnnotation(RequestMapping.class);
-                if (mapping.method().equals(req.getMethod())) {
+                RequestMethod requestMethod = RequestMethod.valueOf(req.getMethod());
+                if (List.of(mapping.methods()).contains(requestMethod)) {
                     return method;
                 }
             }

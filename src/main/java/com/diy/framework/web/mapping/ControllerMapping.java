@@ -2,6 +2,7 @@ package com.diy.framework.web.mapping;
 
 import com.diy.framework.web.annotation.Controller;
 import com.diy.framework.web.annotation.RequestMapping;
+import com.diy.framework.web.annotation.RequestMethod;
 import com.diy.framework.web.beans.factory.BeanFactory;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,7 +15,7 @@ public class ControllerMapping {
     private final Map<ControllerKey, Object> patternRoutes = new HashMap<>();
 
     public Object getController(HttpServletRequest req) {
-        ControllerKey key = new ControllerKey(req.getMethod(), req.getRequestURI());
+        ControllerKey key = new ControllerKey(RequestMethod.valueOf(req.getMethod()), req.getRequestURI());
 
         if(exactRoutes.containsKey(key)) {
             return exactRoutes.get(key);
@@ -42,7 +43,9 @@ public class ControllerMapping {
             for (Method method : controller.getClass().getMethods()) {
                 if (method.isAnnotationPresent(RequestMapping.class)) {
                     RequestMapping mapping = method.getAnnotation(RequestMapping.class);
-                    setController(new ControllerKey(mapping.method(), mapping.value()), controller);
+                    for (RequestMethod requestMethod : mapping.methods()) {
+                        setController(new ControllerKey(requestMethod, mapping.value()), controller);
+                    }
                 }
             }
         });
