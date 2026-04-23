@@ -39,6 +39,7 @@ public class ControllerMapping {
     }
 
     public void register(BeanFactory beanFactory) {
+        // 애너테이션 기반 컨트롤러 매핑
         beanFactory.getBeans(Controller.class).forEach(controller -> {
             for (Method method : controller.getClass().getMethods()) {
                 if (method.isAnnotationPresent(RequestMapping.class)) {
@@ -49,5 +50,17 @@ public class ControllerMapping {
                 }
             }
         });
+
+        // 인터페이스 기반 컨트롤러 매핑
+        beanFactory.getBeansByType(com.diy.framework.web.Controller.class)
+                .forEach(controller -> {
+                    Class<?> clazz = controller.getClass();
+                    if (clazz.isAnnotationPresent(RequestMapping.class)) {
+                        RequestMapping mapping = clazz.getAnnotation(RequestMapping.class);
+                        for (RequestMethod requestMethod : mapping.methods()) {
+                            setController(new ControllerKey(requestMethod, mapping.value()), controller);
+                        }
+                    }
+                });
     }
 }

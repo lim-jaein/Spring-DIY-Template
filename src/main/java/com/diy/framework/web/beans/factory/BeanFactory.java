@@ -90,6 +90,13 @@ public class BeanFactory {
                 .orElseThrow(() -> new RuntimeException(clazz.getSimpleName() + " 빈을 찾을 수 없음"));
     }
 
+    // 타입으로 빈 리스트 조회
+    public List<Object> getBeansByType(Class<?> clazz) {
+        return beans.values().stream()
+                .filter(b -> clazz.isAssignableFrom(b.getClass()))
+                .collect(Collectors.toList());
+    }
+
     private Constructor<?> findAutowiredConstructor(Class<?> clazz) {
         return Arrays.stream(clazz.getDeclaredConstructors())
                 .filter(constructor -> constructor.isAnnotationPresent(Autowired.class))

@@ -37,9 +37,15 @@ public class DispatcherServlet extends HttpServlet {
             return;
         }
         try {
-            Method method = findMethod(controller, req);
-            ModelAndView modelAndView = (ModelAndView) method.invoke(controller, req, resp);
-            render(req, resp, modelAndView);
+            // 인터페이스 방식
+            if (controller instanceof Controller) {
+                ((Controller) controller).handleRequest(req, resp);
+            } else {
+                // 애너테이션 방식
+                Method method = findMethod(controller, req);
+                ModelAndView modelAndView = (ModelAndView) method.invoke(controller, req, resp);
+                render(req, resp, modelAndView);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
