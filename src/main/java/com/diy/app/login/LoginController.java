@@ -12,11 +12,10 @@ import javax.servlet.http.HttpServletResponse;
 @Component
 @RequestMapping(value = "/login")
 public class LoginController implements Controller {
-    private static final Logger log = LoggerFactory.getLogger(LoginController.class);
 
     @Override
     public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        log.debug("loginController test");
+        System.out.println("loginController test");
         // 인터페이스 방식은 내부에서 http method 분기처리 필요
     }
 }

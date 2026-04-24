@@ -1,6 +1,6 @@
 package com.diy.framework.web;
 
-import com.diy.framework.web.beans.factory.BeanFactory;
+import com.diy.app.config.BeanConfig;
 import com.diy.framework.web.context.ApplicationContext;
 import com.diy.framework.web.handler.AnnotationHandlerMapping;
 import com.diy.framework.web.handler.Handler;
@@ -23,7 +23,7 @@ public class DispatcherServlet extends HttpServlet {
     private final List<HandlerMapping> handlerMappings;
     private final ViewResolver viewResolver = new ViewResolver();
 
-    DispatcherServlet() {
+    public DispatcherServlet() {
         handlerMappings = List.of(
                 new AnnotationHandlerMapping(),
                 new InterfaceHandlerMapping()
@@ -32,11 +32,8 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     public void init() {
-        ApplicationContext applicationContext =
-                (ApplicationContext) getServletContext().getAttribute("applicationContext");
-
-        BeanFactory beanFactory = applicationContext.getBeanFactory();
-        handlerMappings.forEach(handlerMapping -> handlerMapping.register(beanFactory));
+        ApplicationContext applicationContext = new ApplicationContext("com.diy", new BeanConfig());
+        handlerMappings.forEach(hm -> hm.register(applicationContext.getBeanFactory()));
     }
 
     @Override
