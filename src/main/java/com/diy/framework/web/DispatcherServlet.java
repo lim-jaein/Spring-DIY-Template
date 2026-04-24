@@ -1,9 +1,11 @@
 package com.diy.framework.web;
 
-import com.diy.framework.web.annotation.RequestMapping;
-import com.diy.framework.web.annotation.RequestMethod;
+import com.diy.framework.web.beans.factory.BeanFactory;
 import com.diy.framework.web.context.ApplicationContext;
-import com.diy.framework.web.mapping.ControllerMapping;
+import com.diy.framework.web.handler.AnnotationHandlerMapping;
+import com.diy.framework.web.handler.Handler;
+import com.diy.framework.web.handler.HandlerMapping;
+import com.diy.framework.web.handler.InterfaceHandlerMapping;
 import com.diy.framework.web.model.ModelAndView;
 import com.diy.framework.web.view.View;
 import com.diy.framework.web.view.ViewResolver;
@@ -13,37 +15,46 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Objects;
 
 @WebServlet("/")
 public class DispatcherServlet extends HttpServlet {
-    private final ControllerMapping controllerMapping = new ControllerMapping();
+    private final List<HandlerMapping> handlerMappings;
     private final ViewResolver viewResolver = new ViewResolver();
+
+    DispatcherServlet() {
+        handlerMappings = List.of(
+                new AnnotationHandlerMapping(),
+                new InterfaceHandlerMapping()
+        );
+    }
 
     @Override
     public void init() {
         ApplicationContext applicationContext =
                 (ApplicationContext) getServletContext().getAttribute("applicationContext");
 
-        controllerMapping.register(applicationContext.getBeanFactory());
+        BeanFactory beanFactory = applicationContext.getBeanFactory();
+        handlerMappings.forEach(handlerMapping -> handlerMapping.register(beanFactory));
     }
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        Object controller = controllerMapping.getController(req);
-        if (controller == null) {
+        Handler handler = handlerMappings.stream()
+                .map(handlerMapping -> handlerMapping.getHandler(req))
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(null);
+
+        if (handler == null) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
+
         try {
-            // 인터페이스 방식
-            if (controller instanceof Controller) {
-                ((Controller) controller).handleRequest(req, resp);
-            } else {
-                // 애너테이션 방식
-                Method method = findMethod(controller, req);
-                ModelAndView modelAndView = (ModelAndView) method.invoke(controller, req, resp);
+            ModelAndView modelAndView = handler.handleRequest(req, resp);
+            if (modelAndView != null) {
                 render(req, resp, modelAndView);
             }
         } catch (Exception e) {
@@ -51,18 +62,7 @@ public class DispatcherServlet extends HttpServlet {
         }
     }
 
-    private Method findMethod(Object controller, HttpServletRequest req) {
-        for (Method method : controller.getClass().getMethods()) {
-            if (method.isAnnotationPresent(RequestMapping.class)) {
-                RequestMapping mapping = method.getAnnotation(RequestMapping.class);
-                RequestMethod requestMethod = RequestMethod.valueOf(req.getMethod());
-                if (List.of(mapping.methods()).contains(requestMethod)) {
-                    return method;
-                }
-            }
-        }
-        throw new RuntimeException("해당 url로 매핑된 메서드가 없습니다: " + req.getMethod() + " " + req.getRequestURI());
-    }
+
 
     private void render(HttpServletRequest req, HttpServletResponse resp, ModelAndView modelAndView) throws Exception {
         final String viewName = modelAndView.getViewName();
