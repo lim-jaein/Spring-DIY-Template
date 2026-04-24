@@ -70,11 +70,6 @@ public class BeanFactory {
         }
     }
 
-    // 이름으로 빈 조회
-    public Object getBean(String name) {
-        return beans.get(name);
-    }
-
     // 어노테이션으로 빈 조회
     public Collection<Object> getBeans(Class<? extends Annotation> annotation) {
         return beans.values().stream()
