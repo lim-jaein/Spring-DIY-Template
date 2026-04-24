@@ -20,19 +20,18 @@ import java.util.Objects;
 
 @WebServlet("/")
 public class DispatcherServlet extends HttpServlet {
-    private final List<HandlerMapping> handlerMappings;
+    private List<HandlerMapping> handlerMappings;
     private final ViewResolver viewResolver = new ViewResolver();
-
-    public DispatcherServlet() {
-        handlerMappings = List.of(
-                new AnnotationHandlerMapping(),
-                new InterfaceHandlerMapping()
-        );
-    }
 
     @Override
     public void init() {
         ApplicationContext applicationContext = new ApplicationContext("com.diy", new BeanConfig());
+
+        handlerMappings = List.of(
+                new AnnotationHandlerMapping(),
+                new InterfaceHandlerMapping()
+        );
+
         handlerMappings.forEach(hm -> hm.register(applicationContext.getBeanFactory()));
     }
 
