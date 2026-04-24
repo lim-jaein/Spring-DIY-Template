@@ -1,23 +1,23 @@
-package com.diy.framework.web.mapping;
+package com.diy.framework.web.handler;
 
 import com.diy.framework.web.annotation.RequestMethod;
 
 import java.util.Objects;
 
-public class ControllerKey {
+public class HandlerKey {
     private final RequestMethod method;
     private final String path;
 
-    public ControllerKey(RequestMethod method, String path) {
+    public HandlerKey(RequestMethod method, String path) {
         this.method = method;
         this.path = path;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof ControllerKey other)) return false;
+        if (!(obj instanceof HandlerKey other)) return false;
 
-        return this.method.equals(other.method) && this.path.equals(other.path);
+        return Objects.equals(this.method, other.method);
     }
 
     @Override
@@ -25,7 +25,7 @@ public class ControllerKey {
         return Objects.hash(method, path);
     }
 
-    public boolean matches(ControllerKey other) {
+    public boolean matches(HandlerKey other) {
         return this.method.equals(other.method) && other.path.matches(this.path.replaceAll("\\{[^}]+}", "[0-9]+"));
     }
 
