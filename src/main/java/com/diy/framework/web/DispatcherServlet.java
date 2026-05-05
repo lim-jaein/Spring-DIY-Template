@@ -6,6 +6,7 @@ import com.diy.framework.web.handler.AnnotationHandlerMapping;
 import com.diy.framework.web.handler.Handler;
 import com.diy.framework.web.handler.HandlerMapping;
 import com.diy.framework.web.handler.InterfaceHandlerMapping;
+import com.diy.framework.web.handler.RestAnnotationHandlerMapping;
 import com.diy.framework.web.model.ModelAndView;
 import com.diy.framework.web.view.View;
 import com.diy.framework.web.view.ViewResolver;
@@ -29,7 +30,8 @@ public class DispatcherServlet extends HttpServlet {
 
         handlerMappings = List.of(
                 new AnnotationHandlerMapping(),
-                new InterfaceHandlerMapping()
+                new InterfaceHandlerMapping(),
+                new RestAnnotationHandlerMapping()
         );
 
         handlerMappings.forEach(hm -> hm.register(applicationContext.getBeanFactory()));
